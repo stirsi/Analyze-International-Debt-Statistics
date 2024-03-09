@@ -1,0 +1,6 @@
+Data Source Link: https://divvy-tripdata.s3.amazonaws.com/index.html
+
+Data License: https://www.divvybikes.com/data-license-agreement
+
+Tableau Dashboard Link: https://public.tableau.com/views/Cyclistic_17097568083580/Dashboard1?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link
+
