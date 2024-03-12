@@ -15,6 +15,19 @@ set ride_length = ended_at - started_at
 update tripdata_202301
 set day_of_week = to_char(started_at, 'Day')
 
+-- listing the rows where the ride length is negative!!
+select *
+from tripdata_202301
+where ride_length < '00:00:00'
+-- 272 rows have negative ride length. 
+
+-- deleting rows where the ride length is negative
+delete 
+from tripdata_202301
+where ride_length < '00:00:00'
+-- 272 rows are deleted. 
+
+
 -- average monthly ride lengths by rider type
 select extract(month from started_at) as month,
 	member_casual, 
@@ -62,10 +75,25 @@ from tripdata_202301
 group by member_casual, month, day_of_week
 order by month
 
--- average and max ride length by rider type
-select member_casual, max(ride_length), avg(ride_length)
+--overall average, median and max ride lengths
+select 
+	max(ride_length), 
+	avg(ride_length),
+	PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY ride_length) as median_ride_length
+from tripdata_202301
+
+-- average, median and max ride length by rider type
+select 
+	member_casual, 
+	max(ride_length), 
+	avg(ride_length),
+	PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY ride_length) as median_ride_length
 from tripdata_202301
 group by member_casual
+
+-- ride count 
+select count(ride_id)
+from tripdata_202301
 
 -- ride count by member type
 select count(ride_id),
@@ -194,6 +222,17 @@ from tripdata_202301
 group by member_casual, season
 order by member_casual
 
+-- median ride length by season and rider type
+select season,
+	member_casual, 
+	PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY ride_length) as median_ride_length
+from tripdata_202301
+where ride_length >= '00:00:00'
+group by member_casual, season
+order by member_casual
+
+
+
 -- ride count by quarter and rider type
 select extract(quarter from started_at) as quarter,
 	count(*),
@@ -232,4 +271,4 @@ order by count(*) desc
 limit 20
 
 -- export the table to a csv file 
-COPY (SELECT * FROM tripdata_202301) TO 'C:\Documents_Not_Syncing\Google Data Analysis Course\Case Study 1\output.csv' WITH CSV HEADER;
+COPY (SELECT * FROM tripdata_202301) TO 'C:\Documents_Not_Syncing\Google Data Analysis Course\Case Study 1\output_2.csv' CSV HEADER;
